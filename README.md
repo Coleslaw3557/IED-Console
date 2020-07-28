@@ -1,5 +1,5 @@
 ## Goal
-To get remote console and network access to devices where normal remote access is unavailable using a sim card.
+To get remote console and network access to devices where normal remote access is unavailable using a sim card. Device turns on, gets 4g IP, wireguards to jump box. Team SSHs to Pi through Wireguard and accesses console ports and network.
 
 ![](2.png)
 
