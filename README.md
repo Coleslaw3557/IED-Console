@@ -1,7 +1,7 @@
 ## Goal
 To get remote console and network access to devices where normal remote access is unavailable using a sim card.
 
-![2.png]
+![](2.png)
 
 ## Hardware Used
 * Raspberry Pi
@@ -24,7 +24,7 @@ I could not find a Pi case big enough to hold the Pi and Hat so I ended up hacki
 The 4g hat has multiple configurations available. I have the antenna wired to 'main' and the jumpers in the default posistion (B).
 The USB port "UART" is unused and I have a usb cable connecting the HAT's "USB" port to the Pi's USB port. There may be a way to remove this cable but I have not figured out how yet.
 
-![3.jpg]
+![](3.jpg)
 
 ### Software Used
 * Raspbian
