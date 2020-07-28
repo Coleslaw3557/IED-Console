@@ -159,7 +159,6 @@ screen /dev/ttyUSB0 9600
 ### Network Access
 You can also take advantage of SSH to get access over the sim card to the ethernet port of the Pi. Example, "you need to bootstrap a web based firewall through the management port but it's not online yet".
 
-![](network.png)
 ```
 # Set static IP on Pi
 ip link set eth0 down
@@ -173,3 +172,5 @@ ssh -D 8080 <ip of pi>
 # You can now access anything on the LAN side of the Pi
 http://192.168.1.99
 ```
+### Firefox Settings:
+![](network.png)
