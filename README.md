@@ -3,9 +3,9 @@ To get remote console and network access to devices where normal remote access i
 
 ![](2.png)
 
-## Hardware Used
+### Hardware Used
 * Raspberry Pi
-* Waveshare 4G HAT - https://www.waveshare.com/sim7600g-h-4g-hat.htm
+* Waveshare 4G HAT - https://www.waveshare.com/SIM7600G-H-4G-HAT.htm (I am using the global version)
 * Activated Data only sim card through Google Fi
 * Sim card adapter (tiny sim card to full sized)
 * USB Battery Pack - Anker PowerCore 20100mAh (supplied 4.8A output)- https://www.anker.com/products/variant/powercore-20100/A1271012
@@ -13,15 +13,20 @@ To get remote console and network access to devices where normal remote access i
 * USB to Serial adapter - This one seems to have a genuine FTDI chip - https://www.amazon.com/gp/product/B00QUZY4JC/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1
 * Console cable of your choice.
 
+### Resources:
+* Waveshare Wiki - https://www.waveshare.com/wiki/SIM7600A-H_4G_HAT
+* Telnyx Blog Post - https://developers.telnyx.com/docs/v2/wireless/tutorials/sim7600
+* RPI Form Post - https://www.raspberrypi.org/forums/viewtopic.php?p=1374909#p1450784
+
 ### Notes
 I am in the US and using a data only sim through Google Fi (tmobile). You must activate the sim card before hand.
-Regarding the wireguard config, I included an example for the Pi; however, you must configure the server. I am not going to cover this as there are plenty of other guides out there. A perk to Google Fi is I can enable/disable the data sim from the Google Fi app on my phone which helps keep the bill down. Also to bootstrap this, I connected directly to the serial headers on the Pi with an FT232 board; however, this access method does not work with the 4g hat as it uses these ports. You will need to access the Pi via SSH over the ethernet port or plug in with a keyboard/monitor.
+Regarding the wireguard config, I included an example for the Pi; however, you must configure the server. I am not going to cover this as there are plenty of other guides out there. A perk to Google Fi is I can enable/disable the data sim from the Google Fi app on my phone which helps keep the bill down. Also to bootstrap this, I connected directly to the serial headers on the Pi with an FT232 board; however, this access method does not work with the 4g hat as it uses these ports (I could RX but not TX). You will need to access the Pi via SSH over the ethernet port or plug in with a keyboard/monitor.
 
 ### Case
-I could not find a Pi case big enough to hold the Pi and Hat so I ended up hacking something together with what I had laying around. I also remove the Pi's audio port to make room for the 4g Antenna as shown on the side of the case.
+I could not find a Pi case big enough to hold the Pi and Hat so I ended up hacking something together with what I had laying around. I also remove the Pi's audio port to make room for the 4g Antenna as shown on the side of the case. A little hot glue and the retaining screw is holding it in place.
 
 ### Wiring
-The 4g hat has multiple configurations available. I have the antenna wired to 'main' and the jumpers in the default posistion (B).
+I have the antenna wired to 'main' and the jumpers in the default posistion (B).
 The USB port "UART" is unused and I have a usb cable connecting the HAT's "USB" port to the Pi's USB port. There may be a way to remove this cable but I have not figured out how yet.
 
 ![](3.jpg)
