@@ -133,7 +133,7 @@ sudo systemctl enable 4g.service
 ```
 
 ### Wireguard Config (sanitized)
-/etc/wireguard/wg.conf
+/etc/wireguard/wg0.conf
 ```
 [Interface]
 PrivateKey = 
