@@ -57,7 +57,7 @@ APN=h2g2
 PROXY=yes
 ```
 
-### Testing the 4g card is on the netowrk
+### Testing the 4g card is on the network.
 ```
 Manufacturer:
 qmicli -p -d /dev/cdc-wdm0 --dms-get-manufacturer
@@ -145,6 +145,7 @@ sudo systemctl enable wg-quick@wg0
 ### Testing
 At this point, if all is well your Pi has a public IP over 4g and is VPNing back to your server using wireguard. You should now be able to access the Pi remotely and use a terminal program of your choice to access the serial port.
 
+![](1.png)
 ```
 screen /dev/ttyUSB0 9600
 ```
