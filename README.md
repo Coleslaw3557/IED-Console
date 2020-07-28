@@ -17,6 +17,7 @@ To get remote console and network access to devices where normal remote access i
 * Waveshare Wiki - https://www.waveshare.com/wiki/SIM7600A-H_4G_HAT
 * Telnyx Blog Post - https://developers.telnyx.com/docs/v2/wireless/tutorials/sim7600
 * RPI Form Post - https://www.raspberrypi.org/forums/viewtopic.php?p=1374909#p1450784
+* IP Command Cheatsheet - https://access.redhat.com/sites/default/files/attachments/rh_ip_command_cheatsheet_1214_jcs_print.pdf
 
 ### Notes
 I am in the US and using a data only sim through Google Fi (tmobile). You must activate the sim card before hand.
@@ -153,4 +154,22 @@ At this point, if all is well your Pi has a public IP over 4g and is VPNing back
 ![](1.png)
 ```
 screen /dev/ttyUSB0 9600
+```
+
+### Network Access
+You can also take advantage of SSH to get access over the sim card to the ethernet port of the Pi. Example, "you need to bootstrap a web based firewall through the management port but it's not online yet".
+
+![](network.png)
+```
+# Set static IP on Pi
+ip link set eth0 down
+ip addr add 192.168.1.10/24 dev eth0
+ip link set eth0 up
+
+# From your workstation
+ssh -D 8080 <ip of pi>
+
+# Change Firefox to use Socks proxy.
+# You can now access anything on the LAN side of the Pi
+http://192.168.1.99
 ```
