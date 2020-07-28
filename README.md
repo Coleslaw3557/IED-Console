@@ -156,6 +156,11 @@ sudo systemctl enable wg-quick@wg0
 At this point, if all is well your Pi has a public IP over 4g and is VPNing back to your server using wireguard. You should now be able to access the Pi remotely and use a terminal program of your choice to access the serial port.
 
 ![](1.png)
+
+### Access Console Port
+* Find the device with dmesg
+* You can close out of screen with CTRL-A Z
+
 ```
 screen /dev/ttyUSB0 9600
 ```
