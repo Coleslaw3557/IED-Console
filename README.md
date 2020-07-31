@@ -88,48 +88,237 @@ qmicli -p -d /dev/cdc-wdm0 --dms-get-revision
 
 ### Shell script to bring the 4g module online and get an IP.
 ### /usr/start_4g.sh
-This script turns on the 4g module. The wwan0 interface MUST be down before qmi-network runs.
+This script turns on the 4g module. The wwan0 interface MUST be down before qmi-network runs. Thank you @Pintovski on RPI Forums. Google's APN is hg2g. Change that value in the script below if you're on another carrier.
+
 ```
-#!/bin/sh
-/bin/ip link set wwan0 up
-# Turn the module on
-/usr/bin/qmicli -d /dev/cdc-wdm0 --dms-set-operating-mode='online'
-/bin/sleep 5
-/bin/ip link set wwan0 down
-/bin/sleep 3
-/bin/ip link set wwan0 down
-# Bring the interface up using the settings in /etc/qmi-network.conf
-/usr/bin/qmi-network /dev/cdc-wdm0 start
-# Get an IP over the 4g Network.
-/sbin/udhcpc -i wwan0
+#!/bin/bash
+LOG_PATH="/home/pi/4G.log"
+sim7600_4G_hat_init_PATH = "/home/pi"
+MAX_TRIES=20
+
+N_TRY=0
+TRY=""
+
+echo "Logs go to: $LOG_PATH"
+rm $LOG_PATH
+
+echo "---------------------------------" > "$LOG_PATH"
+echo "Connecting 4G-LTE" >> "$LOG_PATH"
+echo "-check hat net led---------------" >> "$LOG_PATH"
+echo "-sim7600_4G_hat_ini--------------" >> "$LOG_PATH"
+
+echo "$LOG_PATH"
+echo "---------------------------------"
+echo "Connecting 4G-LTE"
+echo "-check hat net led---------------"
+echo "-sim7600_4G_hat-ini--------------"
+
+sh "$sim7600_4G_hat_init_PATH" >> "$LOG_PATH"
+
+while [ "$TRY" != "done" ]
+do
+   N_TRY=$((N_TRY + 1))
+
+   echo "--try $N_TRY --" >> "$LOG_PATH"
+   echo "--try $N_TRY --"
+
+   echo "--dms SET operating mode--" >> "$LOG_PATH"
+   echo "--dms SET operating mode--"
+
+   sudo qmicli -d /dev/cdc-wdm0 --dms-set-operating-mode='online' >> "$LOG_PATH"
+
+   echo "--dms GET operating mode--" >> "$LOG_PATH"
+   echo "--dms GET operating mode--"
+
+   sudo qmicli -d /dev/cdc-wdm0 --dms-get-operating-mode >> "$LOG_PATH"
+
+   if [ "$N_TRY" = "$MAX_TRIES" ]
+   then
+
+      echo "reached MAX_TRIES = $MAX_TRIES" >> "$LOG_PATH"
+      echo "reached MAX_TRIES = $MAX_TRIES"
+
+      TRY="done"
+   fi
+   temp="$(grep -c "online" "$LOG_PATH")"
+
+   if [ $temp -eq 1 ]
+   then
+      echo "Success! <0.0>" >> "$LOG_PATH"
+      grep "online" "$LOG_PATH" >> "$LOG_PATH"
+
+      echo "Success! <0.0>"
+      grep "online" "$LOG_PATH"
+
+      TRY="done"
+   fi
+done
+
+echo "Needed $N_TRY tries to connect" >> "$LOG_PATH"
+echo "-get-signal-strength-------------" >> "$LOG_PATH"
+
+echo "Needed $N_TRY tries to connect"
+echo "-get-signal-strength-------------"
+
+
+sudo qmicli -d /dev/cdc-wdm0 --nas-get-signal-strength >> "$LOG_PATH"
+
+tail -14 "$LOG_PATH"
+
+echo "-get-home-network----------------" >> "$LOG_PATH"
+
+echo "-get-home-network----------------"
+
+sudo qmicli -d /dev/cdc-wdm0 --nas-get-home-network >> "$LOG_PATH"
+
+echo "- -w ----------------------------" >> "$LOG_PATH"
+
+echo "- -w ----------------------------"
+
+sudo qmicli -d /dev/cdc-wdm0 -w >> "$LOG_PATH"
+
+echo "-wwan0 down----------------------" >> "$LOG_PATH"
+
+echo "-wwan0 down----------------------"
+
+sudo ip link set wwan0 down >> "$LOG_PATH"
+
+echo "-raw_ip -> Y---------------------" >> "$LOG_PATH"
+
+echo "-raw_ip -> Y---------------------"
+
+echo 'Y' | sudo tee /sys/class/net/wwan0/qmi/raw_ip >> "$LOG_PATH"
+
+echo "-wwan0 up------------------------" >> "$LOG_PATH"
+
+echo "-wwan0 up------------------------"
+
+sudo ip link set wwan0 up >> "$LOG_PATH"
+
+echo "-get-autoconnect-settings--------" >> "$LOG_PATH"
+
+echo "-get-autoconnect-settings--------"
+
+sudo qmicli -d /dev/cdc-wdm0 --wds-get-autoconnect-settings >> "$LOG_PATH"
+
+echo "-set-autoconnect-settings--------" >> "$LOG_PATH"
+
+echo "-set-autoconnect-settings--------"
+
+sudo qmicli -d /dev/cdc-wdm0 --wds-set-autoconnect-settings=disabled >> "$LOG_PATH"
+
+tail -2 "$LOG_PATH"
+
+echo "if error 26 -> its ok. It means that autoconnect was already disabled" >> "$LOG_PATH"
+echo "-start network-------------------" >> "$LOG_PATH"
+
+echo "if error 26 -> its ok. It means that autoconnect was already disabled"
+echo "-start network-------------------"
+
+N_TRY=0
+TRY=""
+while [ "$TRY" != "done" ]
+do
+   N_TRY=$((N_TRY + 1))
+
+   echo "--try $N_TRY --" >> "$LOG_PATH"
+   echo "--try $N_TRY --"
+
+# CHANGE THIS NEXT LINE TO MATCH YOUR COMMUNICATION PROVIDER
+   sudo qmicli -p -d /dev/cdc-wdm0 --device-open-net='net-raw-ip|net-no-qos-header' --wds-start-network="apn='hg2g',ip-type=4" --client-no-release-cid >> "$LOG_PATH"
+
+   if [ "$N_TRY" = "$MAX_TRIES" ]
+   then
+
+      echo "reached MAX_TRIES = $MAX_TRIES" >> "$LOG_PATH"
+      echo "reached MAX_TRIES = $MAX_TRIES"
+
+      TRY="done"
+   else
+      echo "...$N_TRY of $MAX_TRIES: unable to start network. Trying again in 5s."
+      sleep 5
+   fi
+   temp="$(grep -c "\[/dev/cdc-wdm0\] Network started" "$LOG_PATH")"
+
+   if [ $temp -eq 1 ]
+   then
+      echo "...$N_TRY of $MAX_TRIES: Success!" >> "$LOG_PATH"
+      grep "\[/dev/cdc-wdm0\] Network started" "$LOG_PATH" >> "$LOG_PATH"
+
+      echo "...$N_TRY of $MAX_TRIES: Success!"
+      grep "\[/dev/cdc-wdm0\] Network started" "$LOG_PATH"
+
+      TRY="done"
+   fi
+done
+
+echo "network started ?"
+echo "network started ?" >> "$LOG_PATH"
+
+echo "-start---------------------------" >> "$LOG_PATH"
+
+echo "-start---------------------------"
+
+sudo qmi-network /dev/cdc-wdm0 start >> "$LOG_PATH"
+
+echo "-udhcpc--------------------------" >> "$LOG_PATH"
+
+echo "-udhcpc--------------------------"
+
+sudo udhcpc -t 10 -i wwan0 >> "$LOG_PATH"
+
+echo "-ip a s--------------------------" >> "$LOG_PATH"
+
+echo "-ip a s--------------------------"
+
+ip a s wwan0 >> "$LOG_PATH"
+
+echo "-ip r s--------------------------" >> "$LOG_PATH"
+
+echo "-ip r s--------------------------"
+
+ip r s >> "$LOG_PATH"
+
+echo "-ifconfig------------------------" >> "$LOG_PATH"
+echo "ifconfig" >> "$LOG_PATH"
+echo "---------------------------------" >> "$LOG_PATH"
+ifconfig wwan0
+
+ifconfig >> "$LOG_PATH"
+
+echo "-manufacturer--------------------" >> "$LOG_PATH"
+sudo qmicli --device=/dev/cdc-wdm0 --device-open-proxy --dms-get-manufacturer >> "$LOG_PATH"
+
+echo "-model---------------------------" >> "$LOG_PATH"
+sudo qmicli --device=/dev/cdc-wdm0 --device-open-proxy --dms-get-model >> "$LOG_PATH"
+
+echo "-firmware------------------------" >> "$LOG_PATH"
+sudo qmicli --device=/dev/cdc-wdm0 --device-open-proxy --dms-get-revision >> "$LOG_PATH"
+
+echo "-IMEI----------------------------" >> "$LOG_PATH"
+sudo qmicli --device=/dev/cdc-wdm0 --device-open-proxy --dms-get-ids >> "$LOG_PATH"
+
+echo "-SIM-status----------------------" >> "$LOG_PATH"
+sudo qmicli --device=/dev/cdc-wdm0 --device-open-proxy --uim-get-card-status >> "$LOG_PATH"
+
+echo "-qmicli version------------------" >> "$LOG_PATH"
+sudo qmicli --version >> "$LOG_PATH"
+
+echo "-final-testing-------------------" >> "$LOG_PATH"
+sudo ping -c 1 -I wwan0 8.8.8.8 >> "$LOG_PATH"
+
+echo "-final-testing-------------------"
+#sudo ping -c 1 -I wwan0 8.8.8.8
+tail -7 "$LOG_PATH"
+
 ```
 
-### /etc/systemd/system/4g.service
-Settings are to enable service at the very end of bootup.
+### Crontab
+As pi crontab user have the script run at boot:
 ```
-[Unit]
-Description=Enable 4G
-After=sysinit.target
-StartLimitIntervalSec=0
-
-[Service]
-Type=idle
-Restart=no
-User=root
-ExecStart=/usr/start_4g.sh
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Permissions and Systemd
-```
-sudo chmod +x /usr/start_4g.sh
-sudo chmod 664 /etc/systemd/system/4g.service
-# daemon-reload must be rerun if you change your script/systemd config file.
-sudo systemctl daemon-reload
-# Tell Systemd to run the service at bootup.
-sudo systemctl enable 4g.service
+sudo chmod +x /usr/start.sh
+crontab -e
+@reboot /usr/start.sh
 ```
 
 ### Wireguard Config (sanitized)
