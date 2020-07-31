@@ -94,7 +94,7 @@ This script turns on the 4g module. The wwan0 interface MUST be down before qmi-
 #!/bin/bash
 LOG_PATH="/home/pi/4G.log"
 sim7600_4G_hat_init_PATH = "/home/pi"
-MAX_TRIES=20
+MAX_TRIES=2
 
 N_TRY=0
 TRY=""
