@@ -313,12 +313,30 @@ tail -7 "$LOG_PATH"
 
 ```
 
+### Script to check that Pi is still connected and rerun the script if the connection dies.
+/usr/check.sh
+```
+#!/bin/bash
+TURN_ON_SCRIPT_PATH="/usr/start.sh"
+inet_count="$(ifconfig wwan0 | grep -c 'inet ')"
+
+if [ $inet_count -eq 1 ]
+then
+  echo "-> wwan0 is connected."
+else
+  echo "-> wwan0 is offline."
+  sudo sh "$TURN_ON_SCRIPT_PATH"
+fi
+```
+
 ### Crontab
 As pi crontab user have the script run at boot:
 ```
 sudo chmod +x /usr/start.sh
+sudo chmod +x /usr/check.sh
 crontab -e
 @reboot /usr/start.sh
+2 * * * * /usr/check.sh
 ```
 
 ### Wireguard Config (sanitized)
