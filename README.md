@@ -87,7 +87,7 @@ qmicli -p -d /dev/cdc-wdm0 --dms-get-revision
 ```
 
 ### Shell script to bring the 4g module online and get an IP.
-### /usr/start_4g.sh
+### /usr/start.sh
 This script turns on the 4g module. The wwan0 interface MUST be down before qmi-network runs. Thank you @Pintovski on RPI Forums. Google's APN is hg2g. Change that value in the script below if you're on another carrier.
 
 ```
